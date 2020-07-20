@@ -8,22 +8,23 @@ use App\User;
 
 class UserCheckController extends Controller
 {
-    public function index(){
+    // ユーザーIDが空の場合はゲストとして適当なユーザーIDを発行してもらう
+    // ユーザーIDが空じゃなければそのユーザーの情報を返してもらう(DB未登録時は新規追加)
+    public function check(){
         $users = new User;
-        $is_exist_user = false;
+        $user_id = 0;
         if (!empty($_GET["user_id"])) {
             $user_id = $_GET["user_id"];
-            $id = $users->whereRaw("`user_id` = $user_id")->value('id');
-            if(empty($id)){
-                $is_exist_user = false;
-            } else {
-                $is_exist_user = true;
+            $userID = $users->whereRaw("`user_id` = $user_id")->value('user_id');
+            // テーブルに登録されてなければ登録
+            if($userID===null){
+                User::insert(['name' => 'user', 'user_id' => strval($user_id), 'point' => "0", 'rank' => 0, 'created_at' => date("Y-m-d H:i:s"), 'updated_at' => date("Y-m-d H:i:s")]);
             }
         } else {
-            $is_exist_user = false;
+            $user_id = 1;
         }
         $result = [
-            'result'      => $is_exist_user
+            'user_id'      => $user_id
         ];
         return $this->resConversionJson($result);
     }

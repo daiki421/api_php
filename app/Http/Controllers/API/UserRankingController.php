@@ -8,17 +8,36 @@ use App\User;
 
 class UserRankingController extends Controller
 {
-    public function rank(){
+    // スコア保存
+    public function set(){
         $users = new User;
-        $result = [];
-        $users_info = $users->get();
-        foreach($users_info as $user_info){
-            $result = [$user_info->user_id => [
-                'name'         => $user_info->name,
-                'rank'         => $user_info->rank,
-                'point'        => $user_info->point
-            ]];
+        if (!empty($_GET["user_id"])) {
+            $user_id = $_GET["user_id"];
+            $userID = $users->whereRaw("`user_id` = $user_id")->value('user_id');
+            if($userID===null) {
+                // 何もしない
+            } else {
+                if (!empty($_GET["score"])) {
+                    $score = $_GET["score"];
+                    // スコア保存
+                    User::where('user_id', $userID)->update(['point' => strval($score)]);
+                }   
+            }
         }
+    }
+
+    // スコア取得
+    public function get(){
+        $users = new User;
+        if (!empty($_GET["user_id"])) {
+            $user_id = $_GET["user_id"];
+            $score = $users->whereRaw("`user_id` = $user_id")->value('point');
+        } else {
+            $score = "0";
+        }
+        $result = [
+            'score'      => $score
+        ];
         return $this->resConversionJson($result);
     }
 
