@@ -11,29 +11,35 @@ class UserRankingController extends Controller
     // スコア保存
     public function set(){
         $users = new User;
-        if (!empty($_GET["user_id"])) {
-            $user_id = $_GET["user_id"];
-            $userID = $users->whereRaw("`user_id` = $user_id")->value('user_id');
+        if (isset($_POST["user_id"])) {
+            $user_id = $_POST["user_id"];
+            $userID = $users->where([['user_id', '>', $user_id]])->value('user_id');
             if($userID===null) {
                 // 何もしない
             } else {
-                if (!empty($_GET["score"])) {
-                    $score = $_GET["score"];
+                if (isset($_POST["score"])) {
+                    $score = $_POST["score"];
                     // スコア保存
-                    User::where('user_id', $userID)->update(['point' => strval($score)]);
-                }   
+                    $users->where('user_id', $userID)->update(['point' => strval($score)]);
+                }
             }
+        } else {
         }
+        $result = [
+            'result'      => true
+        ];
+        return $this->resConversionJson($result);
     }
 
     // スコア取得
     public function get(){
         $users = new User;
-        if (!empty($_GET["user_id"])) {
-            $user_id = $_GET["user_id"];
-            $score = $users->whereRaw("`user_id` = $user_id")->value('point');
+        $score = "0";
+        if (isset($_POST["user_id"])) {
+            $user_id = $_POST["user_id"];
+            $score = $users->where([['user_id', '>', $user_id]])->value('point');
         } else {
-            $score = "0";
+            $score = "no_data";
         }
         $result = [
             'score'      => $score

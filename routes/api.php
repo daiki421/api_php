@@ -18,7 +18,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('ver','API\VerController@index');
-Route::get('check','API\UserCheckController@check');
-Route::get('get','API\UserRankingController@get');
-Route::get('set','API\UserRankingController@set');
+Route::match(['get', 'post'], '/ver','API\VerController@index');
+// Route::post('check','API\UserCheckController@check');
+// Route::post('get','API\UserRankingController@get');
+// Route::post('set','API\UserRankingController@set');
+Route::post('ver','API\VerController@index');
+Route::post('check','API\UserCheckController@check');
+Route::post('get','API\UserRankingController@get');
+Route::post('set','API\UserRankingController@set');
